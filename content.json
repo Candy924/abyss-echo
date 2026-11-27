@@ -1,0 +1,18 @@
+{
+  "_comment": "雲端內容包：只改數字，不用重新部署程式。改完存檔即生效（玩家下次開啟或刷新）。",
+  "version": 1,
+  "balance": {
+    "enemyHpPerFloor": 0.022,
+    "enemyDmgPerFloor": 0.014
+  },
+  "payLinks": {
+    "kofi": "",
+    "paypal": "",
+    "gumroad": ""
+  },
+  "weapons": {},
+  "enemies": {},
+  "talents": {},
+  "difficulty": {},
+  "chests": {}
+}

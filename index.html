@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>深淵迴響 Abyss Echo · Roguelike 動作射擊</title>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b0913">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="深淵迴響">
+<meta name="application-name" content="深淵迴響">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
+<link rel="stylesheet" href="style.css?v=91">
+</head>
+<body>
+<div id="stage">
+  <div id="frame">
+    <canvas id="game" width="480" height="270" aria-label="game"></canvas>
+    <div id="titleArt"></div>
+<div id="tint"></div>
+<div id="cineTag" class="cine-tag hidden">13 heroes · Mythic weapons · 6 chapters</div>
+
+    <!-- ================= HUD ================= -->
+    <div id="hud" class="hidden">
+      <div class="hud-left">
+        <div class="bar hp"><div class="fill" id="hpFill"></div><span id="hpText">120 / 120</span></div>
+        <div class="bar en"><div class="fill" id="enFill"></div><span id="enText">100 / 100</span></div>
+        <div class="weapon-card">
+          <canvas id="weaponIcon" class="wicon" width="34" height="34"></canvas>
+          <div class="wmeta">
+            <b id="weaponText">手槍</b>
+            <div class="slots">
+              <span class="eq-slot" id="eqSlot0"><canvas id="eq0" width="20" height="20"></canvas></span>
+              <span class="eq-slot" id="eqSlot1"><canvas id="eq1" width="20" height="20"></canvas></span>
+              <span class="eq-slot" id="eqSlot2"><canvas id="eq2" width="20" height="20"></canvas></span>
+              <span class="eq-slot" id="eqSlot3"><canvas id="eq3" width="20" height="20"></canvas></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hud-right">
+        <div class="chip gold"><i class="ico-coin"></i><b id="coinText">0</b></div>
+        <div class="chip"><i class="key-icon"></i><b id="keyText">0</b></div>
+        <div class="chip rewind"><b id="rewindText">1</b><span>倒帶</span></div>
+        <div class="chip"><b id="floorText">1</b><span>層</span></div>
+        <div class="chip chapter"><b id="chapterText">腐朽墓穴</b></div>
+        <div class="chip diff"><b id="diffTagName">中等</b></div>
+        <div class="chip"><b id="killText">0</b><span>擊殺</span></div>
+      </div>
+
+      <div class="hud-bottom">
+        <div class="skill" id="skDash">
+          <div class="cool" id="skDashCool"></div>
+          <span>衝刺<em>Space</em><b class="cdt" id="skDashT"></b></span>
+        </div>
+        <div class="skill" id="skHero">
+          <div class="cool" id="skHeroCool"></div>
+          <canvas class="skic" id="skHeroIc" width="34" height="34"></canvas>
+          <span id="skHeroName">技能<em>Shift</em><b class="cdt" id="skHeroT"></b></span>
+        </div>
+        <div class="skill ult" id="skUlt">
+          <div class="fill" id="skUltFill"></div>
+          <canvas class="skic" id="skUltIc" width="34" height="34"></canvas>
+          <span id="skUltName">大招<em>Q</em><b class="cdt" id="skUltT"></b></span>
+        </div>
+      </div>
+
+      <div id="enemyTag">剩餘 0</div>
+
+      <button id="btnUnstick" class="hud-btn" title="脫離卡點（U）">脫困</button>
+
+      <div id="bossBar" class="hidden">
+        <div class="fill" id="bossFill"></div>
+        <span id="bossName">深淵守衛</span>
+      </div>
+    </div>
+
+    <!-- ================= 觸控層 ================= -->
+    <div id="touch" class="hidden">
+      <div id="moveZone"></div>
+      <div id="stick"><i class="base"></i><i class="knob" id="knob"></i></div>
+      <button id="tAim" class="tbtn aim" aria-label="攻擊"><span>攻擊</span><i class="cd"></i></button>
+      <button id="tSkill" class="tbtn skill" aria-label="技能"><canvas class="tic" id="tSkillIc" width="40" height="40"></canvas><span>技能</span><i class="cd"></i></button>
+      <button id="tDash" class="tbtn dash" aria-label="衝刺"><span>衝刺</span><i class="cd"></i></button>
+      <button id="tUse" class="tbtn use hidden" aria-label="使用"><span>使用</span></button>
+      <button id="tPause" class="tbtn pause" aria-label="暫停"><span>∥</span></button>
+      <button id="tUlt" class="tbtn ult" aria-label="大招"><canvas class="tic" id="tUltIc" width="40" height="40"></canvas><span>大招</span><i class="cd"></i></button>
+      <div id="touchHint">左半邊拖曳移動 · 右下按住攻擊，拖曳可調方向</div>
+    </div>
+
+    <!-- ================= 浮動提示 ================= -->
+    <div id="prompt" class="hidden"></div>
+    <div id="toast" class="hidden"></div>
+    <div id="banner" class="hidden"></div>
+    <div id="verTag">0.00.00</div>
+
+    <!-- ================= 寶箱三選一 ================= -->
+    <div id="chestModal" class="modal hidden">
+      <div class="chest-panel">
+        <div class="chest-head">
+          <h3 id="chestTitle">木箱</h3>
+          <p>選擇一件帶走 · 按 <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 也可以</p>
+        </div>
+        <div id="chestCards" class="chest-cards"></div>
+        <button id="chestSkip" class="ghost">先不拿（保留寶箱）</button>
+      </div>
+    </div>
+
+    <!-- ================= 詳細資訊 ================= -->
+    <div id="infoModal" class="modal hidden">
+      <div class="info-panel" id="infoPanel"></div>
+    </div>
+
+    <!-- ================= 載入畫面 ================= -->
+    <div id="loadingScreen">
+      <div class="load-ring"></div>
+      <h2 class="load-title">深淵迴響</h2>
+      <p class="load-sub">ABYSS ECHO</p>
+      <div class="load-bar"><i id="loadFill"></i></div>
+      <p class="load-pct" id="loadPct">0%</p>
+      <p class="load-tip">正在載入場景與素材…</p>
+    </div>
+
+    <!-- ================= 更新提示 ================= -->
+    <div id="updateBar" class="hidden">
+      <span id="updateText">有新版本</span>
+      <button id="btnUpdateNow" class="primary">立即更新</button>
+      <button id="btnUpdateLater" class="ghost">稍後</button>
+    </div>
+
+    <!-- ================= 選單 ================= -->
+    <div id="ui">
+
+      <section id="screen-title" class="screen title-screen">
+        <div class="title-solo">
+          <div class="crest">✦</div>
+          <div class="logo-row">
+            <canvas class="logo-orn" id="logoL" width="40" height="40"></canvas>
+            <h1 class="logo">深淵迴響</h1>
+            <canvas class="logo-orn" id="logoR" width="40" height="40"></canvas>
+          </div>
+          <p class="sub">ABYSS ECHO</p>
+          <button id="btnContinue" class="continue-btn hidden">繼續冒險</button>
+          <button id="btnPlay" class="mega">
+            <span class="mega-glow"></span>
+            <span class="mega-label">進入地城</span>
+            <span class="mega-sub">選擇章節 · 難度 · 開始冒險</span>
+          </button>
+          <div class="gem-row"><i class="ico-gem"></i><b id="gemText">0</b><span>魔晶</span></div>
+          <p class="tiny" id="bestText">最佳紀錄：尚未出發</p>
+          <div class="title-btns">
+            <button id="btnHeroes">角色</button>
+            <button id="btnUpgrade">強化</button>
+            <button id="btnVault">寶庫</button>
+            <button id="btnShop">商店</button>
+            <button id="btnBag">背包</button>
+            <button id="btnHelp" class="ghost">操作</button>
+            <button id="btnSettings" class="ghost">設置</button>
+            <button id="btnNews" class="ghost">公告<span id="newsDot" class="news-dot hidden"></span></button>
+          </div>
+          <div class="legal-links">
+            <button id="btnExportOut" class="linklike">匯出檔案</button>
+            <span>·</span>
+            <button id="btnImportOut" class="linklike">匯入檔案</button>
+            <span>·</span>
+            <button id="btnTermsTitle" class="linklike">服務條款</button>
+            <span>·</span>
+            <button id="btnPrivacyTitle" class="linklike">隱私權政策</button>
+            <span>·</span>
+            <span class="ver-mini">v<span id="verMini">0.00.00</span></span>
+            <input type="file" id="importOutFile" accept="application/json" class="hidden">
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-difficulty" class="screen hidden">
+        <div class="panel wide diff-panel">
+          <h2>選擇難度</h2>
+          <p class="sub2">難度越高，敵人越強 —— 但魔晶與幸運獎勵也越好</p>
+          <div id="diffGrid" class="diff-grid"></div>
+          <div class="btns"><button id="btnDiffBack" class="ghost">返回</button></div>
+        </div>
+      </section>
+
+      <section id="screen-heroes" class="screen hidden">
+        <div class="hero-page">
+          <div class="hero-stage">
+            <div class="hero-stage-glow"></div>
+            <img id="heroBigArt" alt="" draggable="false">
+            <div class="hero-stage-cap">
+              <b id="heroBigName">—</b>
+              <span id="heroBigRole">—</span>
+            </div>
+          </div>
+          <aside class="hero-side">
+            <h2 class="hero-title">SELECT YOUR HERO</h2>
+            <div id="heroDetail" class="hero-detail"></div>
+            <div class="hero-actions">
+              <button id="btnHeroBack" class="ghost">Back</button>
+              <button id="btnStartRun" class="primary">Set off</button>
+            </div>
+          </aside>
+          <div id="heroGrid" class="hero-strip"></div>
+        </div>
+      </section>
+
+      <section id="screen-upgrade" class="screen hidden">
+        <div class="panel wide">
+          <h2>永久強化</h2>
+          <p class="sub2">用魔晶提升基礎能力，每一輪都生效</p>
+          <div class="gem-row small"><i class="ico-gem"></i><b id="gemText2">0</b><span>魔晶</span></div>
+          <div id="upList" class="up-list"></div>
+          <div class="btns"><button id="btnUpBack" class="ghost">返回</button></div>
+        </div>
+      </section>
+
+      <section id="screen-help" class="screen hidden">
+        <div class="panel wide">
+          <h2>操作說明</h2>
+          <table class="keys pc-only">
+            <tr><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></td><td>移動</td></tr>
+            <tr><td><kbd>滑鼠</kbd></td><td>瞄準</td></tr>
+            <tr><td><kbd>左鍵</kbd></td><td>攻擊（可按住連射）</td></tr>
+            <tr><td><kbd>Space</kbd></td><td>翻滾衝刺：短暫無敵</td></tr>
+            <tr><td><kbd>Shift</kbd></td><td>角色技能</td></tr>
+            <tr><td><kbd>Q</kbd></td><td>終極大招（能量滿時）</td></tr>
+            <tr><td><kbd>F</kbd></td><td>開寶箱 / 交易</td></tr>
+            <tr><td><kbd>Tab</kbd></td><td>角色數值與裝備</td></tr>
+            <tr><td><kbd>U</kbd></td><td>脫離卡點</td></tr>
+            <tr><td><kbd>Esc</kbd> / <kbd>M</kbd></td><td>暫停 / 靜音</td></tr>
+          </table>
+          <table class="keys touch-only">
+            <tr><td>左半邊拖曳</td><td>移動（放開即停）</td></tr>
+            <tr><td>右下「攻擊」按住</td><td>自動瞄準最近的敵人並持續射擊</td></tr>
+            <tr><td>按住後拖曳</td><td>手動調整射擊方向</td></tr>
+            <tr><td>技能 / 衝刺鈕</td><td>角色技能、翻滾衝刺</td></tr>
+            <tr><td>使用鈕</td><td>開寶箱、交易</td></tr>
+            <tr><td>右上 ∥</td><td>暫停（含脫困與數值）</td></tr>
+          </table>
+          <p class="tiny">寶箱會給你三選一：武器、裝備或補給 —— 不選就保留寶箱，<b>絕不會強制換掉你手上的武器</b>。<br>每 10 層換一個章節與全新敵人；每章最後一層是頭目。</p>
+          <div class="btns"><button id="btnHelpBack" class="ghost">返回</button></div>
+        </div>
+      </section>
+
+      <section id="screen-pause" class="screen hidden">
+        <div class="panel">
+          <h2>暫停</h2>
+          <p class="sub2" id="pauseInfo"></p>
+          <div id="pauseStats" class="stat-grid"></div>
+          <div class="btns col">
+            <button id="btnResume" class="primary">繼續</button>
+            <button id="btnStats">數值 / 裝備</button>
+            <button id="btnUnstick2">脫離卡死</button>
+            <button id="btnRestart">重新開始</button>
+            <button id="btnQuit" class="ghost">帶著獎勵離開</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-stats" class="screen hidden">
+        <div class="panel wide">
+          <h2>角色數值</h2>
+          <div id="statsBody" class="stats"></div>
+          <div class="btns"><button id="btnStatsBack" class="ghost">回到遊戲</button></div>
+        </div>
+      </section>
+
+      <section id="screen-chapters" class="screen hidden">
+        <div class="panel wide">
+          <h2>選擇章節</h2>
+          <p class="sub2">每章 30 層 · 3 小關 · 破關後解鎖下一章，已通關的章節可以重複挑戰</p>
+          <div id="chapterGrid" class="chapter-grid"></div>
+          <div class="btns"><button id="btnChapterBack" class="ghost">返回</button></div>
+        </div>
+      </section>
+
+      <section id="screen-chapterclear" class="screen hidden">
+        <div class="panel">
+          <div class="stage-badge">✦</div>
+          <h2 id="ccTitle">章節通關</h2>
+          <p class="sub2" id="ccSub"></p>
+          <div id="ccStats" class="stats"></div>
+          <div class="btns col">
+            <button id="btnCCBack" class="primary">返回主畫面</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-talents" class="screen hidden">
+        <div class="panel wide">
+          <h2>選擇天賦</h2>
+          <p class="sub2">踏入下一層前，挑一個強化（可累積）</p>
+          <div id="talentCards" class="talent-cards"></div>
+          <div class="btns"><button id="btnSkipTalent" class="ghost">跳過</button></div>
+        </div>
+      </section>
+
+      <section id="screen-stageclear" class="screen hidden">
+        <div class="panel stage-panel">
+          <div class="stage-badge">★</div>
+          <h2 id="scTitle">小關完成</h2>
+          <p class="sub2" id="scSub">繼續前往下一個小關，或帶著獎勵離開</p>
+          <div id="scStats" class="stats"></div>
+          <div class="btns col">
+            <button id="btnStageNext" class="primary">繼續下一小關</button>
+            <button id="btnStageLeave" class="ghost">帶著獎勵離開</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-settings" class="screen hidden">
+        <div class="panel">
+          <h2>設置</h2>
+          <div class="set-row">
+            <label for="setMusic">音樂音量</label>
+            <input type="range" id="setMusic" min="0" max="100" value="100">
+            <b id="setMusicVal">100%</b>
+          </div>
+          <div class="set-row">
+            <label for="setSfx">音效音量</label>
+            <input type="range" id="setSfx" min="0" max="100" value="100">
+            <b id="setSfxVal">100%</b>
+          </div>
+          <div class="set-row">
+            <label for="setLang">語言</label>
+            <select id="setLang">
+              <option value="tw">繁體中文</option>
+              <option value="cn">简体中文</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <div class="set-row">
+            <label for="setQuality">畫面品質</label>
+            <select id="setQuality">
+              <option value="high">高（粒子全開）</option>
+              <option value="mid" selected>中（平衡）</option>
+              <option value="low">低（省電）</option>
+            </select>
+          </div>
+          <div class="set-row">
+            <label>存檔（局外）</label>
+            <button id="setExport">匯出檔案</button>
+            <button id="setImport" class="ghost">匯入檔案</button>
+            <input type="file" id="setImportFile" accept="application/json" class="hidden">
+          </div>
+          <div class="set-row">
+            <label>條款</label>
+            <button id="btnTerms">服務條款</button>
+            <button id="btnPrivacy" class="ghost">隱私權政策</button>
+          </div>
+          <p class="tiny" id="setSaveInfo"></p>
+          <div class="btns"><button id="btnSettingsBack" class="ghost">返回</button></div>
+        </div>
+      </section>
+
+      <section id="screen-vault" class="screen hidden">
+        <div class="panel wide">
+          <h2>寶庫</h2>
+          <p class="sub2">裝備與寶箱分開管理 · 解鎖的裝備會出現在寶箱裡</p>
+          <div class="vault-head">
+            <span class="key-icon"></span><b id="vaultKeys">0</b><span>把鑰匙</span>
+          </div>
+          <div class="vault-tabs">
+            <button id="vaultTabEquip" class="on">裝備</button>
+            <button id="vaultTabChest">寶箱</button>
+          </div>
+          <div id="vaultPaneEquip" class="vault-pane">
+            <div class="vault-slots" id="vaultSlots"></div>
+            <div class="vault-btns">
+              <button id="btnFuse" class="primary">合成裝備（同部位同等級）</button>
+            </div>
+            <div class="vault-recycle-box"><div class="forge-head"><span>回收區域</span><b>把不要的裝備換成魔晶</b></div><div id="vaultRecycle" class="vault-recycle"></div></div>
+            <div class="vault-inv" id="vaultInv"></div>
+          </div>
+          <div id="vaultPaneChest" class="vault-pane hidden">
+            <div class="vault-btns">
+              <button id="btnKeyChest0" class="primary">木箱 · 銅鑰匙</button>
+              <button id="btnKeyChest1">鐵箱 · 銀鑰匙</button>
+              <button id="btnKeyChest2">金箱 · 金鑰匙</button>
+            </div>
+            <div class="pink-chest-box">
+              <div class="pink-chest-art" id="pinkChestArt"></div>
+              <div class="pink-chest-info">
+                <b>粉紅寶箱</b>
+                <span id="pinkKeyText">粉紅鎖匙 0 把</span>
+                <p class="tiny">開啟後必定獲得傳說（75%）或神話（25%）裝備。</p>
+                <button id="btnPinkChest" class="primary">開啟粉紅寶箱</button>
+              </div>
+            </div>
+            <p class="tiny">金色以上寶箱有機會開出已解鎖的傳說／神話裝備。</p>
+          </div>
+          <div class="btns"><button id="btnVaultBack" class="ghost">返回</button></div>
+        </div>
+      </section>
+
+      <section id="screen-runshop" class="screen hidden">
+        <div class="panel">
+          <h2>地牢商人</h2>
+          <p class="sub2">傳送門後的補給空間 · 金幣 <b id="runShopCoins">0</b></p>
+          <div id="runShopList" class="shop-room-list"></div>
+          <div class="btns"><button id="btnRunShopLeave" class="primary">繼續前進</button></div>
+        </div>
+      </section>
+
+      <section id="screen-bag" class="screen hidden">
+        <div class="panel wide">
+          <h2>背包</h2>
+          <p class="sub2">戰鬥中掉落的武器會自動放進背包 · 同類型 3 把可合成高一階</p>
+          <div id="bagList" class="bag-list"></div>
+          <div class="btns"><button id="btnBagBack" class="ghost">返回</button></div>
+        </div>
+      </section>
+
+      <section id="screen-shop" class="screen hidden">
+        <div class="panel wide">
+          <h2>商店</h2>
+          <p class="sub2">付費武器解鎖後會進入寶箱池，也可以直接設為出戰武器</p>
+          <div id="shopList" class="shop-list"></div>
+          <div id="mythicBox" class="mythic-box"></div>
+          <div id="slotBox" class="slot-box"></div>
+          <div id="ultBox" class="slot-box"></div>
+          <div id="equipUnlockBox" class="slot-box"></div>
+          <div class="paid-box">
+            <div class="paid-info">
+              <b>Premium Pack</b>
+              <span>3 名付費角色＋混沌武器「炸天」，一次付款永久解鎖</span>
+            </div>
+            <div class="paid-btns">
+              <button id="btnBuy">Unlock free (30s)</button>
+              <button id="btnRedeem" class="ghost">輸入解鎖碼</button>
+            </div>
+          </div>
+          <div class="paid-box gift">
+            <div class="paid-info">
+              <b>Ultimate Weapon Pack</b>
+              <span>一次解鎖全部傳說＋神話武器（共 20 把），並開放終極核彈</span>
+            </div>
+            <div class="paid-btns">
+              <button id="btnGiftBuy">Unlock free (30s)</button>
+              <button id="btnGiftRedeem" class="ghost">輸入禮包碼</button>
+            </div>
+          </div>
+          <p class="shop-status" id="shopStatus"></p>
+          <p class="tiny">購買後永久解鎖，可設為出戰武器帶進地城。</p>
+          <div class="btns"><button id="btnShopBack" class="ghost">返回</button></div>
+        </div>
+      </section>
+
+      <section id="screen-end" class="screen hidden">
+        <div class="panel">
+          <h2 id="endTitle">你倒下了</h2>
+          <p class="sub2" id="endSub">深淵不會記得你的名字</p>
+          <div id="endStats" class="stats"></div>
+          <div class="btns col">
+            <button id="btnAgain" class="primary">再來一輪</button>
+            <button id="btnEndHome" class="ghost">回到標題</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div id="iosTip" class="hidden">
+  <span>要全螢幕遊玩：點下方的 <b>分享</b> → <b>加入主畫面</b></span>
+  <button id="iosTipClose">×</button>
+</div>
+
+<pre id="errlog" style="position:fixed;left:0;bottom:0;color:#f66;font-size:10px;z-index:9999;margin:0;pointer-events:none;white-space:pre-wrap;max-width:100vw"></pre>
+
+<div id="tutorial" class="tut hidden"><div class="tut-icon" id="tutIcon">WASD</div><div class="tut-main"><div class="tut-title" id="tutTitle">移動</div><div class="tut-text" id="tutText">用 WASD / 方向鍵移動</div><div class="tut-step" id="tutStep">1 / 3</div></div><button id="btnTutSkip">跳過</button></div>
+
+  <div id="legalModal" class="legal hidden">
+    <div class="legal-box">
+      <button id="btnLegalX" class="legal-x" aria-label="關閉">✕</button>
+      <div class="legal-head">
+        <b id="legalTitle">服務條款</b>
+        <button id="btnLegalClose" class="ghost">關閉</button>
+      </div>
+      <div class="legal-body" id="legalBody">載入中…</div>
+      <div class="legal-foot">
+        <button id="btnLegalClose2" class="primary">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <button id="hudBag" class="hud-bag" onclick="window.__bagTap && window.__bagTap(event)">BAG (B)</button>
+
+<script src="js/data.js?v=91"></script>
+<script src="js/lang-en.js?v=91"></script>
+<script src="js/i18n.js?v=91"></script>
+<script src="js/content.js?v=91"></script>
+<script src="js/ads.js?v=91"></script>
+<!-- 平台 SDK：本機／GitHub Pages 會載入失敗，ads.js 會自動退回示範廣告 -->
+<script src="https://sdk.crazygames.com/crazygames-sdk-v3.js" defer onerror="window.__cgSdkFail=1"></script>
+<script src="js/version.js?v=91"></script>
+<script src="js/news.js?v=91"></script>
+<script src="js/unlock.js?v=91"></script>
+<script src="js/art.js?v=91"></script>
+<script src="js/audio.js?v=91"></script>
+<script src="js/updater.js?v=91"></script>
+<script src="js/game.js?v=91"></script>
+<script src="js/owner.js?v=91"></script>
+<script src="js/pwa.js?v=91"></script>
+  </body>
+</html>

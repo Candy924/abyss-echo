@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Abyss Echo — Press & Marketing Creatives</title>
+<style>
+  :root{color-scheme:dark}
+  body{background:#0a0710;color:#e8e2f4;font:15px/1.7 system-ui,"Segoe UI","Microsoft JhengHei",sans-serif;margin:0;padding:30px 20px 70px}
+  .wrap{max-width:900px;margin:0 auto}
+  h1{color:#f3c250;font-size:24px;margin:0 0 4px}
+  h2{color:#c9a6ff;font-size:17px;margin:28px 0 8px;border-left:3px solid #6a4a92;padding-left:10px}
+  p{color:#cfc6ee}
+  .muted{color:#8f86b5;font-size:13px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin:12px 0}
+  .card{background:#120d22;border:1px solid #2a2240;border-radius:10px;padding:10px;text-align:center}
+  .card img{width:100%;height:auto;border-radius:6px;display:block;margin-bottom:8px}
+  .card a{display:inline-block;font-size:12.5px;color:#8cf0ff;text-decoration:none;border:1px solid #2a5a6a;padding:4px 10px;border-radius:999px}
+  .card .n{font-size:12px;color:#b9b2d6;margin-bottom:6px;word-break:break-all}
+  video{width:100%;border-radius:10px;border:1px solid #2a2240;background:#000}
+  code{background:#1a1430;padding:1px 5px;border-radius:4px;color:#ffe6a1}
+  .note{background:#160f28;border-left:3px solid #f3c250;padding:10px 14px;border-radius:6px;font-size:13.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Abyss Echo — Press Kit &amp; Marketing Creatives</h1>
+<p class="muted">Pixel dungeon roguelike · Free-to-play · Traditional Chinese / Simplified Chinese / English</p>
+
+<div class="note">
+<strong>Usage:</strong> These assets are provided for editorial coverage and platform listings of <em>Abyss Echo</em>.
+Please do not modify the artwork or use it to imply endorsement. No personal contact details are published on this page.
+</div>
+
+<h2>Preview video — landscape (1920×1080, 16 s, no audio)</h2>
+<video controls muted playsinline poster="landscape-1920x1080.png">
+  <source src="preview-1920x1080.mp4" type="video/mp4">
+</video>
+<p class="muted">Download: <a href="preview-1920x1080.mp4">preview-1920x1080.mp4</a></p>
+
+<h2>Preview video — portrait (1080×1620, 16 s, no audio)</h2>
+<video controls muted playsinline poster="portrait-800x1200.png" style="max-width:420px">
+  <source src="preview-portrait-1080x1620.mp4" type="video/mp4">
+</video>
+<p class="muted">Download: <a href="preview-portrait-1080x1620.mp4">preview-portrait-1080x1620.mp4</a></p>
+
+<h2>Key art</h2>
+<div class="grid" id="art"></div>
+
+<h2>Screenshots (1920×1080)</h2>
+<div class="grid" id="shots"></div>
+
+<h2>Logo &amp; icon</h2>
+<div class="grid" id="logos"></div>
+
+<h2>Fact sheet</h2>
+<ul>
+  <li><strong>Title:</strong> Abyss Echo（深淵迴響）</li>
+  <li><strong>Genre:</strong> Action · Roguelike · Pixel art</li>
+  <li><strong>Platform:</strong> Web browser (HTML5) · Windows (Steam build)</li>
+  <li><strong>Players:</strong> Single player</li>
+  <li><strong>Price:</strong> Free (rewarded ads)</li>
+  <li><strong>Languages:</strong> Traditional Chinese, Simplified Chinese, English</li>
+  <li><strong>Controls:</strong> Keyboard + mouse (WASD, aim with mouse, hold left click to fire, Q skill, Shift dash, E ultimate, F interact, B bag); touch sticks on mobile</li>
+  <li><strong>Content:</strong> Stylised combat, no blood or gore, rated 12+</li>
+</ul>
+
+<p class="muted" style="margin-top:28px">© 2026 Abyss Echo. All artwork generated for this project.</p>
+</div>
+<script>
+  var art = [
+    ['landscape-1920x1080.png', 'Cover — landscape 1920×1080'],
+    ['portrait-800x1200.png', 'Cover — portrait 800×1200'],
+    ['square-800x800.png', 'Cover — square 800×800'],
+    ['feature-1024x500.png', 'Feature image 1024×500']
+  ];
+  var shots = [
+    ['01_title.png', 'Title & chapter select'],
+    ['03_battle.png', 'Combat & boss fight'],
+    ['02_heroes.png', 'Hero roster'],
+    ['04_shop.png', 'Shop'],
+    ['05_talent.png', 'Talent choice'],
+    ['06_vault.png', 'Vault & gear']
+  ];
+  var logos = [['icon-512.png', 'App icon 512×512']];
+  function render(id, list) {
+    var box = document.getElementById(id);
+    list.forEach(function (it) {
+      var d = document.createElement('div');
+      d.className = 'card';
+      d.innerHTML = '<img src="' + it[0] + '" alt="' + it[1] + '"><div class="n">' + it[1] + '</div>' +
+        '<a href="' + it[0] + '" download>Download PNG</a>';
+      box.appendChild(d);
+    });
+  }
+  render('art', art); render('shots', shots); render('logos', logos);
+</script>
+</body>
+</html>

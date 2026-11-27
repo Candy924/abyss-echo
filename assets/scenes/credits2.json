@@ -1,0 +1,51 @@
+﻿[
+    {
+        "key":  "factory",
+        "file":  "factory.jpg",
+        "page":  "https://commons.wikimedia.org/wiki/File:Machinery_in_the_water_treatment_plant_of_an_abandoned_steel_factory_in_Oupeye,_Belgium_(DSCF3293).jpg",
+        "license":  "CC BY 4.0",
+        "artist":  "\u003ca href=\"//commons.wikimedia.org/wiki/User:Trougnouf\" title=\"User:Trougnouf\"\u003eTrougnouf\u003c/a\u003e"
+    },
+    {
+        "key":  "cathedral",
+        "file":  "cathedral.jpg",
+        "page":  "https://commons.wikimedia.org/wiki/File:Fig_85_-Interior_System_of_Wells_Cathedral.jpg",
+        "license":  "Public domain",
+        "artist":  "Charles Herbert Moore (1840-1930)"
+    },
+    {
+        "key":  "temple",
+        "file":  "temple.jpg",
+        "page":  "https://commons.wikimedia.org/wiki/File:Hampi,_India,_Stone_sculptures_of_Sri_Krishna_Temple,_Ancient_ruins_of_Hampi.jpg",
+        "license":  "CC BY 4.0",
+        "artist":  "\u003ca href=\"//commons.wikimedia.org/wiki/User:Argenberg\" title=\"User:Argenberg\"\u003eVyacheslav Argenberg\u003c/a\u003e"
+    },
+    {
+        "key":  "galaxy",
+        "file":  "galaxy.jpg",
+        "page":  "https://commons.wikimedia.org/wiki/File:Night_Sky_@_Baiersdorf_-_Flickr_-_markus_spiske.jpg",
+        "license":  "CC0",
+        "artist":  "\u003ca rel=\"nofollow\" class=\"external text\" href=\"https://www.flickr.com/people/125167502@N02\"\u003eMarkus Spiske\u003c/a\u003e from Forchheim, Bavaria Upper Franconia"
+    },
+    {
+        "key":  "frozen",
+        "file":  "frozen.jpg",
+        "page":  "https://commons.wikimedia.org/wiki/File:Ice_Climbing_Frozen_Waterfall_Gavarnie_France.jpg",
+        "license":  "CC BY-SA 3.0",
+        "artist":  "Paul Guerin"
+    },
+    {
+        "key":  "throne",
+        "file":  "throne.jpg",
+        "page":  "https://commons.wikimedia.org/wiki/File:Germany,_King%27s_Throne_Room,_Munich,_Munich_Residence.jpg",
+        "license":  "CC0",
+        "artist":  "\u003cbdi\u003e\u003ca href=\"https://www.wikidata.org/wiki/Q115464159\" class=\"extiw\" title=\"d:Q115464159\"\u003e\u003cspan title=\"developer analyst and photographer from Venezuela\"\u003eWilfredor\u003c/span\u003e\u003c/a\u003e\u003c/bdi\u003e"
+    }
+]
+{
+    "key":  "cathedral",
+    "file":  "cathedral.jpg",
+    "page":  "https://commons.wikimedia.org/wiki/File:St_Marys_Cathedral_Nave_Edinburgh.jpg",
+    "license":  "CC0",
+    "artist":  "\u003ca href=\"//commons.wikimedia.org/wiki/User:Mdbeckwith\" class=\"mw-redirect\" title=\"User:Mdbeckwith\"\u003eMichael D Beckwith\u003c/a\u003e"
+}
